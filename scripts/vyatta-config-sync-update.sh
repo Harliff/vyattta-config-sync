@@ -1,5 +1,24 @@
 #!/bin/bash
+
 HOST=$1
+
+SSH_KEY=/config/auth/$USER/id_rsa 
+
+
+
+if [ ! -f $SSH_KEY ]; then 
+  echo "ERROR: $SSH_KEY missing."  
+  echo ""
+  echo "This version of vyos-config-sync only works with SSH keys."
+  echo ""
+  echo "You need to create ssh-key in $SSH_KEY "
+  echo "and set an admin user with this key on a slave router. "
+  echo ""
+  echo "You can create a key by running \"ssh-keygen -t rsa -N \"\" -f $SSH_KEY\" "
+  echo ""
+  exit 1
+fi
+
 
 function update_status()
 {
@@ -26,9 +45,9 @@ if [ $? -ne 0 ]; then
   PORT="22"
 fi
 PASS=$(cli-shell-api returnEffectiveValue system config-sync remote-router $HOST password)
-status=$(ssh -oStrictHostKeyChecking=no -p $PORT -o BatchMode=yes -o ConnectTimeout=5 $USER@$HOST exit 2>&1 )
+status=$(ssh -oStrictHostKeyChecking=no -i $SSH_KEY -p $PORT -o BatchMode=yes -o ConnectTimeout=5 $USER@$HOST exit 2>&1 )
 if [ $? -ne 0 ]; then
-  echo -e "\t    status:\tcould not connect via 'ssh -p $PORT $USER@$HOST'"  
+  echo -e "\t   status:\tcould not connect via 'ssh -i $SSH_KEY -p $PORT $USER@$HOST'"  
   update_status "failed"
   exit 1
 fi
@@ -146,8 +165,7 @@ source /opt/vyatta/etc/functions/script-template
 ${CHANGESET}  
 EOF
 
-# cat /var/lib/vyatta-config-sync/$HOST.changeset| ssh -oStrictHostKeyChecking=no -p $PORT -o BatchMode=yes -o ConnectTimeout=5 $USER@$HOST 2>/dev/null
-cat /var/lib/vyatta-config-sync/$HOST.changeset| ssh -oStrictHostKeyChecking=no -p $PORT -o BatchMode=yes -o ConnectTimeout=5 $USER@$HOST > /dev/null 2>&1
+cat /var/lib/vyatta-config-sync/$HOST.changeset| ssh -oStrictHostKeyChecking=no -i $SSH_KEY -p $PORT -o BatchMode=yes -o ConnectTimeout=5 $USER@$HOST > /dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo -e "\t    status:\t error applying changeset"
   update_status "failed"
@@ -158,3 +176,4 @@ echo -e "\t    status:\tsynced"
 
 # Update status
 update_status "success"
+
