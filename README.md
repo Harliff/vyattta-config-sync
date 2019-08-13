@@ -1,26 +1,24 @@
-## VyOS config-sync
+# VyOS config sync
 
 This replicates the functionality of the commercial version of Vyatta's config-sync for VyOS and community Vyatta editions.
 
+## Work in progress
+
+Now you can get original config-sync from https://github.com/keshavdv/vyattta-config-sync,
+install it and copy
+https://raw.githubusercontent.com/Harliff/vyattta-config-sync/master/scripts/vyatta-config-sync-update.sh 
+over /opt/vyatta/sbin/vyatta-config-sync-update.sh
+
+Maybe I'll create install package some day. 
+
 #### Installation
 
-To install the prepackaged version, run the following:
-
-    $ wget https://github.com/keshavdv/vyattta-config-sync/releases/download/v0.0.1/vyatta-config-sync_0.0.1_all.deb
+    $ curl https://github.com/keshavdv/vyattta-config-sync/releases/download/v0.0.1/vyatta-config-sync_0.0.1_all.deb \
+    --output "vyatta-config-sync_0.0.1_all.deb"
     $ sudo dpkg -i vyatta-config-sync_0.0.1_all.deb
-
-To compile a debian package yourself, run the following:
-
-    $ https://github.com/keshavdv/vyattta-config-sync/archive/master.zip
-    $ # Extract, install build dependencies
-    $ dpkg-buildpackage -us -uc
-
-#### Issues
-
-This is *alpha* software! It attempts to follow the same API as the commercial config-sync tool but has a very hacked together implementation. Only use it to sync non-critical sections of config like nat or firewall rules to ensure you don't kick yourself out of the device.
-
-
-
+    $ sudo curl https://raw.githubusercontent.com/Harliff/vyattta-config-sync/master/scripts/vyatta-config-sync-update.sh \
+    --output /opt/vyatta/sbin/vyatta-config-sync-update.sh
+    
 #### Usage
 
 Start by creating ssh-key:
