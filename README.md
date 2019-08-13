@@ -19,7 +19,32 @@ To compile a debian package yourself, run the following:
 
 This is *alpha* software! It attempts to follow the same API as the commercial config-sync tool but has a very hacked together implementation. Only use it to sync non-critical sections of config like nat or firewall rules to ensure you don't kick yourself out of the device.
 
+
+
 #### Usage
+
+Start by creating ssh-key:
+
+    mkdir /config/auth/$USER
+    ssh-keygen -t rsa -N "" -f /etc/config/$USER/id_rsa
+    cat /etc/config/$USER/id_rsa.pub # copy the key
+    
+Then create an admin user on another router:
+
+    ssh user@<slave-router-ip>
+    configure
+    edit system login user <username>
+    set level admin
+    edit authentication public-keys <key name (any text)>
+    set type ssh-rsa
+    set key <paste you key here>
+    commit
+    save
+    exit
+    
+Test it!
+    
+    ssh -i /etc/config/$USER/id_rsa <username>@<slave-router-ip>
 
 Basic synchronization is setup via:
 
